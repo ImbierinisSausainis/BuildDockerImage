@@ -23,7 +23,7 @@ jobs:
 
       - name: Install tflint
         run: |
-          curl -LO https://github.com/terraform-linters/tflint/releases/download/v0.29.0/tflint-linux-amd64.zip
+          curl -LO https://github.com/terraform-linters/tflint/releases/download/v0.55.1/tflint-linux-amd64.zip
           unzip tflint-linux-amd64.zip
           sudo mv tflint /usr/local/bin
 
