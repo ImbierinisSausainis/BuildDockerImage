@@ -1,4 +1,4 @@
-name: CI - Terraform Lint and Validate
+name: Terraform Lint and Checks
 
 on:
   push:
