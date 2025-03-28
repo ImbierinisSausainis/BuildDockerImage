@@ -46,7 +46,7 @@ jobs:
             GITHUB_TOKEN: ${{ github.token }}
   
         - name: Run TFLint
-          run: tflint -f default
+          run: tflint -f default --log-level=debug
   
         - name: Terraform Init
           run: terraform init
