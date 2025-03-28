@@ -9,53 +9,62 @@ on:
       - main  # Trigger on PRs targeting 'main' branch
 
 jobs:
-  lint:
+  terraform-plan:
+    lint:
+      runs-on: ubuntu-latest
+      environment: Prod
+      
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+  
+        - name: Set up Terraform
+          uses: hashicorp/setup-terraform@v2
+          with:
+            terraform_version: 1.5.5
+  
+        - name: Ensure TFLint plugin directory exists
+          run: |
+            mkdir -p ~/.tflint.d/plugins
+  
+        - name: Cache plugin dir
+          uses: actions/cache@v4
+          with:
+            path: ~/.tflint.d/plugins
+            key: tflint-${{ hashFiles('.tflint.hcl') }} 
+  
+        - name: Setup TFLint
+          uses: terraform-linters/setup-tflint@v4
+          with:
+            tflint_version: v0.55.1
+  
+        - name: Show TFLint version
+          run: tflint --version
+  
+        - name: Init TFLint
+          run: tflint --init
+          env:
+            GITHUB_TOKEN: ${{ github.token }}
+  
+        - name: Run TFLint
+          run: tflint -f default
+  
+        - name: Terraform Init
+          run: terraform init
+          working-directory: terraform/
+  
+        - name: Terraform Plan
+          run: terraform plan -out=tfplan
+          working-directory: terraform/
+
+  terraform-apply-approval:
     runs-on: ubuntu-latest
-    environment: Prod
-    
+    needs: terraform-plan
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Wait for Manual Approval to Apply Plan
+        run: echo "Waiting for manual approval before applying the plan."
+        environment: Prod
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.5
-
-      - name: Ensure TFLint plugin directory exists
-        run: |
-          mkdir -p ~/.tflint.d/plugins
-
-      - name: Cache plugin dir
-        uses: actions/cache@v4
-        with:
-          path: ~/.tflint.d/plugins
-          key: tflint-${{ hashFiles('.tflint.hcl') }} 
-
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v4
-        with:
-          tflint_version: v0.55.1
-
-      - name: Show TFLint version
-        run: tflint --version
-
-      - name: Init TFLint
-        run: tflint --init
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Run TFLint
-        run: tflint -f default
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform/
-
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-        working-directory: terraform/
-
-      - name: Terraform Apply
-        run: terraform apply tfplan
-        working-directory: terraform/
+      # - name: Terraform Apply
+      #   run: terraform apply tfplan
+      #   working-directory: terraform/
