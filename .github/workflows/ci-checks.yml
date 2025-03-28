@@ -46,7 +46,14 @@ jobs:
             GITHUB_TOKEN: ${{ github.token }}
   
         - name: Run TFLint
-          run: tflint -f default --log-level=debug
+          run: |
+            tflint
+            if [ $? -eq 0 ]; then
+              echo "TFLint: No errors found. Terraform code is valid."
+            else
+              echo "TFLint: Errors found. Please review the output."
+              exit 1 # Ensure the workflow fails
+            fi
   
         - name: Terraform Init
           run: terraform init
