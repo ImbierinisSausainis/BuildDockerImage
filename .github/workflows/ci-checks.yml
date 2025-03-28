@@ -11,6 +11,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    environment: Prod
     
     steps:
       - name: Checkout repository
@@ -52,10 +53,9 @@ jobs:
         working-directory: terraform/
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -out=tfplan
         working-directory: terraform/
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
+        run: terraform apply tfplan
         working-directory: terraform/
