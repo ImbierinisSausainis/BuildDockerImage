@@ -9,10 +9,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Get short commit SHA
+        id: commit_sha
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -22,8 +27,18 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/demo:latest -f docker/Dockerfile .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/demo:${{ steps.commit_sha.outputs.sha_short }} -f docker/Dockerfile .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/demo:latest -f docker/Dockerfile . #Build the latest tag as well
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/demo:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/demo:${{ steps.commit_sha.outputs.sha_short }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/demo:latest #Push the latest tag as well
+
+      # - name: Build Docker image
+      #   run: |
+      #     docker build -t ${{ secrets.DOCKER_USERNAME }}/demo:latest -f docker/Dockerfile .
+
+      # - name: Push Docker image
+      #   run: |
+      #     docker push ${{ secrets.DOCKER_USERNAME }}/demo:latest
