@@ -16,6 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.5
+
       - name: Ensure TFLint plugin directory exists
         run: |
           mkdir -p ~/.tflint.d/plugins
@@ -41,3 +46,13 @@ jobs:
 
       - name: Run TFLint
         run: tflint -f default
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan   
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
