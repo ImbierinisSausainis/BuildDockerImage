@@ -35,10 +35,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/demo:${{ steps.commit_sha.outputs.sha_short }}
           docker push ${{ secrets.DOCKER_USERNAME }}/demo:latest #Push the latest tag as well
 
-      # - name: Build Docker image
-      #   run: |
-      #     docker build -t ${{ secrets.DOCKER_USERNAME }}/demo:latest -f docker/Dockerfile .
-
-      # - name: Push Docker image
-      #   run: |
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/demo:latest
+      - name: Run Docker container
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/demo:${{ steps.commit_sha.outputs.sha_short }}
+          docker run -d --name demo-container -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/demo:${{ steps.commit_sha.outputs.sha_short }}
