@@ -1,10 +1,14 @@
-# Use a base image with the necessary runtime for your app
-FROM node:16-alpine
+# Use an appropriate Java base image (OpenJDK 17)
+FROM openjdk:17-jdk-slim
+
 # Set up the working directory inside the container
 WORKDIR /app
-# Install any necessary dependencies for building the app (if required)
-RUN apk add --no-cache bash
-# Expose the necessary port (change according to your app's needs)
-EXPOSE 3000
-# Default command (this can be overridden by the CI/CD pipeline)
-CMD ["node", "app.js"]
+
+# Copy the Java .jar file into the container
+COPY DevOpsSummative-1.0-SNAPSHOT.jar /app/DevOpsSummative-1.0-SNAPSHOT.jar
+
+# Expose the necessary port (use 8080 for your Java Web App)
+EXPOSE 8080
+
+# Command to run the Java app
+CMD ["java", "-jar", "/app/DevOpsSummative-1.0-SNAPSHOT.jar"]
