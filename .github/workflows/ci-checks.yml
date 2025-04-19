@@ -1,9 +1,7 @@
 name: Terraform Lint and Checks
 
 on:
-  push:
-    branches:
-      - main  # Trigger on push to 'main' branch
+  workflow_dispatch:
   pull_request:
     branches:
       - main  # Trigger on PRs targeting 'main' branch
